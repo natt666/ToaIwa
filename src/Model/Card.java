@@ -19,6 +19,30 @@ public abstract class Card {
                 ", imgBack='" + imgBack + '\'' +
                 '}';
     }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public String getImgFront() {
+        return imgFront;
+    }
+
+    public void setImgFront(String imgFront) {
+        this.imgFront = imgFront;
+    }
+
+    public String getImgBack() {
+        return imgBack;
+    }
+
+    public void setImgBack(String imgBack) {
+        this.imgBack = imgBack;
+    }
 }
 
 

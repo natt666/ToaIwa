@@ -4,21 +4,24 @@ import Model.Joker;
 import Model.Spirit;
 import Model.Warrior;
 
+import javax.swing.*;
+import java.awt.*;
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.List;
 
 public class CardControl {
     public static void main(String[] args) {
     }
 
-    public static ArrayList<Card> CreateStack(){
+    public static Deque<Card> CreateStack(){
         String db_url = "jdbc:mysql://localhost:3306/toaiwa";
         String name = "natalia";
         String passw = "natalia1";
         String query = "select * from cartes";
         int valor, id;
         String imgFront, imgBack;
-        ArrayList<Card> pila = new ArrayList<Card>();
+        List<Card> pila = new ArrayList<>();
 
         try (Connection con = DriverManager.getConnection(db_url, name, passw);
              PreparedStatement ps = con.prepareStatement(query);
@@ -51,7 +54,6 @@ public class CardControl {
                                 Warrior w = new Warrior(valor, imgFront, imgBack, colour);
                                 pila.add(w);
                             }
-
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
@@ -62,8 +64,31 @@ public class CardControl {
             System.out.println("la conexión ha fallado:");
             e.printStackTrace();
         }
-    return pila;
+        Collections.shuffle(pila);
+        Deque<Card> pilaSuffle = new ArrayDeque<>();
+        pilaSuffle.addAll(pila);
+        return pilaSuffle;
     }
 
+    public static Card[] ManoInicial (Deque<Card> pila){
+        Card[] mano = new Card[4];
+        for (int i = 0; i < 4; i++) {
+            mano[i] = pila.removeFirst();
+        }
+    return  mano;
+    }
 
+    public static void InsertarManoUI (Card[] mano, JLabel[] manoLabel){
+        int i = 0;
+        int ancho = 90;
+        int alto = 150;
+        for (Card card : mano) {
+            System.out.println(card);
+            ImageIcon original = new ImageIcon(mano[i].getImgFront());
+            Image imagenEscalada = original.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+            ImageIcon iconoEscalado = new ImageIcon(imagenEscalada);
+            manoLabel[i].setIcon(iconoEscalado);
+            i++;
+        }
+    }
 }

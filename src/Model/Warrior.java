@@ -1,7 +1,22 @@
 package Model;
 
 public class Warrior extends Card{
-    private colour color;
+    private Colour color;
 
-    private enum colour{orange, green, red, blue}
+    public Warrior(int value, String imgFront, String imgBack, Colour color) {
+        super(value, imgFront, imgBack);
+        this.color = color;
+    }
+
+    public enum Colour{orange, green, red, blue}
+
+    @Override
+    public String toString() {
+        return "Warrior{" +
+                "color=" + color +
+                ", value=" + value +
+                ", imgFront='" + imgFront + '\'' +
+                ", imgBack='" + imgBack + '\'' +
+                '}';
+    }
 }

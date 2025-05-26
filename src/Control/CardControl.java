@@ -137,11 +137,9 @@ public class CardControl {
 
             if (cartaDestino == null) {
                 cartasEnDestino[index] = cartaOrigen;
-
                 AsignarImgFront(destinoLabel, cartaOrigen, destinoLabel.getWidth(), destinoLabel.getHeight());
                 manoJug[indiceCartaOrigen] = robarCarta(pila);
                 AsignarImgFront(manoJugLabel[indiceCartaOrigen], manoJug[indiceCartaOrigen], manoJugLabel[indiceCartaOrigen].getWidth(), manoJugLabel[indiceCartaOrigen].getHeight());
-                indiceCartaOrigen = -1;
             } else {
                 if (cartaOrigen instanceof Warrior && cartaDestino instanceof Warrior) {
                     Warrior wOrigen = (Warrior) cartaOrigen;
@@ -150,9 +148,9 @@ public class CardControl {
                     if ((wOrigen.getColor().equals(wDestino.getColor())) && (wOrigen.getValue() != wDestino.getValue())) {
                         cartasEnDestino[index] = cartaOrigen;
                         AsignarImgBack(destinoLabel, cartaOrigen, destinoLabel.getWidth(), destinoLabel.getHeight());
+                        cartaOrigen.setValue(9);
                         manoJug[indiceCartaOrigen] = robarCarta(pila);
                         AsignarImgFront(manoJugLabel[indiceCartaOrigen], manoJug[indiceCartaOrigen], manoJugLabel[indiceCartaOrigen].getWidth(), manoJugLabel[indiceCartaOrigen].getHeight());
-                        indiceCartaOrigen = -1;
                     } else {
                         System.out.println("La carta origen no puede reemplazar a la carta destino: valor menor o igual.");
                     }
@@ -160,10 +158,9 @@ public class CardControl {
                     System.out.println("La carta origen y destino tienen el mismo color, no se puede reemplazar.");
                 }
             }
-            cartaOrigen = null;
-            cartaDestino = null;
         }
     }
+
 
     public static void AsignarImgBack(JLabel label, Card carta, int width, int height) {
         ImageIcon icono = new ImageIcon(carta.getImgBack());
@@ -181,5 +178,7 @@ public class CardControl {
         Card  carta = pila.pollLast();
         return carta;
     }
+
+
 
 }

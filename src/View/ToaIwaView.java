@@ -2,6 +2,7 @@ package View;
 import Control.CardControl;
 import Model.Card;
 import Model.Joker;
+import Model.User;
 import Model.Warrior;
 
 import javax.swing.*;
@@ -18,9 +19,11 @@ public class ToaIwaView {
             CartaO1, CartaO2, CartaO3, labelTimer;
     private static int seconds = 0;
     private boolean isPaused = false;
-    private Card cartaOrigen = null, cartaDestino;
+    private Card cartaOrigen = null;
     private int indiceCartaOrigen = -1;
     private Card[] manoJug;
+    private Timer timer;
+    private User user;
     private JLabel[] manoJugLabel = new JLabel[4];
     private String pausaPath = "src/resources/cartes-mauwi/pausa.png", reanudarPath = "src/resources/cartes-mauwi/play.png";
     private Deque<Card>pila;
@@ -32,6 +35,9 @@ public class ToaIwaView {
         manoJug = CardControl.ManoInicial(pila);
         JFrame frame = new JFrame();
         crearFrame(frame);
+
+        user = User.pedirDatosUsuario();
+        timer.start();
 
         AnadirMouseAdapterCartasJug(manoJug);
         AnadirMouseAdapterDestinos();
@@ -142,14 +148,13 @@ public class ToaIwaView {
         pilaButton.addMouseListener(new CardControl.CambiarMano (manoJug, pila, manoJugLabel));
         Title.add(pilaButton);
 
-        Timer timer = new Timer(1000, new TimeActionListener());
-        timer.start();
+        timer = new Timer(1000, new TimeActionListener());
+
 
         labelTimer = new JLabel();labelTimer.setSize(120, 30);
         labelTimer.setLocation(35,40);
         labelTimer.setForeground(Color.white);
         Title.add(labelTimer);
-
 
         botonPausa = new JButton();
         ImageIcon pausa = new ImageIcon(pausaPath);
@@ -166,8 +171,6 @@ public class ToaIwaView {
         Title.add(botonPausa);
 
         CardControl.InsertarManoUI(manoJug, manoJugLabel);
-
-
 
         frame.setResizable(false);
         frame.setLocation(500, 0);

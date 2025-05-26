@@ -15,10 +15,11 @@ Completar columnes de cartes amb estratègia i rapidesa, utilitzant guerrers de 
 - [x] Creació i gestió de cartes: Warrior, Spirit i Joker
 - [x] Carregat de cartes des de la base de dades
 - [x] Interfície gràfica inicial amb Swing
+- [x] Temporitzador i control de temps per jugador
+- [x] Algunes mecàniques del joc
 
 ### 🔧 Funcionalitats pendents
 - [ ] Mecànica completa del joc
-- [ ] Temporitzador i control de temps per jugador
 - [ ] Emmagatzematge de resultats i guanyadors
 - [ ] Estètica i accessibilitat de la GUI
 

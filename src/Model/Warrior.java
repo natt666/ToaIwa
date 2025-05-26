@@ -19,4 +19,12 @@ public class Warrior extends Card{
                 ", imgBack='" + imgBack + '\'' +
                 '}';
     }
+
+    public Colour getColor() {
+        return color;
+    }
+
+    public void setColor(Colour color) {
+        this.color = color;
+    }
 }

@@ -1,6 +1,9 @@
 package View;
 import Control.CardControl;
 import Model.Card;
+import Model.Joker;
+import Model.User;
+import Model.Warrior;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,39 +14,39 @@ import static Control.CardControl.InsertarManoUI;
 
 public class ToaIwaView {
     private JPanel Title;
-    private JButton pila, botonPausa;
+    private JButton pilaButton, botonPausa;
     private JLabel Carta1, Carta2, Carta3, CartaJ1, CartaJ2, CartaJ3, CartaJ4,
             CartaO1, CartaO2, CartaO3, labelTimer;
     private static int seconds = 0;
     private boolean isPaused = false;
-    private Card cartaSeleccionada = null;
-    private int indiceCartaSeleccionada = -1;
+    private Card cartaOrigen = null;
+    private int indiceCartaOrigen = -1;
     private Card[] manoJug;
-    private JLabel[] manoJugLabel;
-
+    private Timer timer;
+    private User user;
+    private JLabel[] manoJugLabel = new JLabel[4];
+    private String pausaPath = "src/resources/cartes-mauwi/pausa.png", reanudarPath = "src/resources/cartes-mauwi/play.png";
+    private Deque<Card>pila;
+    private Card[] cartasEnDestino = new Card[3];
 
 
     public ToaIwaView() {
-
-        Deque<Card> pila = CardControl.CreateStack();
-        Card[] manoJug = CardControl.ManoInicial(pila);
-        Card[] manoOp = CardControl.ManoInicial(pila);
-
+        pila = CardControl.CreateStack();
+        manoJug = CardControl.ManoInicial(pila);
         JFrame frame = new JFrame();
         crearFrame(frame);
-        JLabel[] manoJugLabel = {CartaJ1, CartaJ2, CartaJ3, CartaJ4};
 
-        CardControl.InsertarManoUI(manoJug, manoJugLabel);
-        for (int i = 0; i < manoJugLabel.length; i++) {
-            final int idx = i;
-        }
+        user = User.pedirDatosUsuario();
+        timer.start();
+
+        AnadirMouseAdapterCartasJug(manoJug);
+        AnadirMouseAdapterDestinos();
     }
 
     public void crearFrame (JFrame frame){
         frame = new JFrame("ToaIwa");
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 
         int cartaWidth = 90;
         int cartaHeight = 150;
@@ -52,9 +55,13 @@ public class ToaIwaView {
         int width_carta_mesa = 90;
         int height_carta_mesa = 140;
         int location_c2;
-
         int anchoTotal = totalCartas * cartaWidth + (totalCartas - 1) * espacio;
         int inicioX = (540 - anchoTotal) / 2;
+
+        pila = CardControl.CreateStack();
+        manoJug = CardControl.ManoInicial(pila);
+
+        Card[] manoOp = CardControl.ManoInicial(pila);
 
         Title = new JPanel();
         Dimension mobileSize = new Dimension(540, 950);
@@ -80,6 +87,11 @@ public class ToaIwaView {
         Title.add(CartaJ2);
         Title.add(CartaJ3);
         Title.add(CartaJ4);
+
+        manoJugLabel[0] = CartaJ1;
+        manoJugLabel[1] = CartaJ2;
+        manoJugLabel[2] = CartaJ3;
+        manoJugLabel[3] = CartaJ4;
 
         Carta2 = new JLabel();
         Carta2.setSize(width_carta_mesa, height_carta_mesa);
@@ -128,32 +140,62 @@ public class ToaIwaView {
         CartaO3.setOpaque(true);
         Title.add(CartaO3);
 
-        pila = new JButton();
-        pila.setSize(110, 60);
-        pila.setLocation(Title.getWidth()/2 + 100, 320);
-        pila.setBackground(Color.yellow);
-        pila.setOpaque(true);
-        Title.add(pila);
+        pilaButton = new JButton();
+        pilaButton.setSize(110, 60);
+        pilaButton.setLocation(Title.getWidth()/2 + 100, 320);
+        pilaButton.setBackground(Color.yellow);
+        pilaButton.setOpaque(true);
+        pilaButton.addMouseListener(new CardControl.CambiarMano (manoJug, pila, manoJugLabel));
+        Title.add(pilaButton);
 
-        Timer timer = new Timer(1000, new TimeActionListener());
-        timer.start();
+        timer = new Timer(1000, new TimeActionListener());
+
 
         labelTimer = new JLabel();labelTimer.setSize(120, 30);
         labelTimer.setLocation(35,40);
         labelTimer.setForeground(Color.white);
         Title.add(labelTimer);
 
-
         botonPausa = new JButton();
+        ImageIcon pausa = new ImageIcon(pausaPath);
+        Image imgesc = pausa.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+        ImageIcon pausae = new ImageIcon(imgesc);
+        botonPausa.setIcon(pausae);
+        botonPausa.setContentAreaFilled(false);
+        botonPausa.setBorderPainted(false);
+        botonPausa.setFocusPainted(true);
+        botonPausa.setOpaque(false);
         botonPausa.setSize(40, 40);
         botonPausa.setLocation(470,40);
         botonPausa.addMouseListener(new ButtonPauseListener(timer));
         Title.add(botonPausa);
 
+        CardControl.InsertarManoUI(manoJug, manoJugLabel);
+
         frame.setResizable(false);
         frame.setLocation(500, 0);
         frame.setContentPane(Title);
         frame.pack();
+    }
+
+    private void AnadirMouseAdapterCartasJug(Card[] manoJug) {
+        for (int i = 0; i < manoJugLabel.length; i++) {
+            final int idx = i;
+            manoJugLabel[i].addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    cartaOrigen = manoJug[idx];
+                    indiceCartaOrigen = idx;
+                    System.out.println("Carta seleccionada: " + cartaOrigen.getValue());
+                    if (cartaOrigen.getValue() == -1){
+                        cartaOrigen = Joker.QueCartaEs();
+                        manoJug[idx] = cartaOrigen;
+                        InsertarManoUI(manoJug, manoJugLabel);
+                    }
+
+                }
+            });
+        }
     }
 
     private class TimeActionListener implements ActionListener {
@@ -163,6 +205,24 @@ public class ToaIwaView {
             int secs = seconds % 60;
             labelTimer.setText(String.format("%d:%02d", minutes, secs));
             seconds++;
+        }
+    }
+
+    private void AnadirMouseAdapterDestinos() {
+        JLabel[] destinos = {Carta1, Carta2, Carta3};
+
+        for (int i = 0; i < destinos.length; i++) {
+            final int idxDestino = i;
+
+            destinos[i].addMouseListener(new CardControl.AnadirMouseAdapterDestino() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    this.mouseClicked(
+                            e, cartasEnDestino, cartaOrigen, indiceCartaOrigen, destinos[idxDestino],
+                            idxDestino, manoJug, pila, manoJugLabel
+                    );
+                }
+            });
         }
     }
 
@@ -178,8 +238,17 @@ public class ToaIwaView {
             super.mouseClicked(e);
             if (isPaused) {
                 timer.start();
+                ImageIcon pausa = new ImageIcon(pausaPath);
+                Image imgesc = pausa.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                ImageIcon pausae = new ImageIcon(imgesc);
+                botonPausa.setIcon(pausae);
+
             } else {
                 timer.stop();
+                ImageIcon reanudar = new ImageIcon(reanudarPath);
+                Image imgesc = reanudar.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                ImageIcon reanudare = new ImageIcon(imgesc);
+                botonPausa.setIcon(reanudare);
             }
             isPaused = !isPaused;
         }
